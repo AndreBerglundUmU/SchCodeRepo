@@ -32,23 +32,14 @@ class Query(object):
 		return np.zeros(shape=(self.timeStorageSize,self.spaceStorageSize),dtype=np.complex_)
 		
 
-def make_Query(function, spaceStorageSize, desiredTimeStorageSize,N):
+def make_query(function, spaceStorageSize, desiredTimeStorageSize,N):
     query = Query(function, spaceStorageSize, desiredTimeStorageSize,N)
     return query
 
 
-def simulation(L,M,T,N,sigma,u0,scheme,queries):
-	XInt = [-L,L]
-	TInt = [0,T]
-	h = (TInt[1]-TInt[0])/N
-	dx = (XInt[1]-XInt[0])/M
-	k = sf.createKVec(XInt[1],XInt[0],M)
-	kSq = np.power(k,2)
-	t = np.linspace(TInt[0],TInt[1],N+1)
-	x = np.linspace(XInt[0],XInt[1],M,endpoint=False)
-	
+def simulation(N,h,k,kSq,sigma,u0,W,scheme,queries):
 	# Need to preallocate memory for query results
-	currU = u0(x)
+	currU = u0
 	queryStorage = []
 	queryIndex = []
 	for q in range(len(queries)):
@@ -57,7 +48,8 @@ def simulation(L,M,T,N,sigma,u0,scheme,queries):
 		queryIndex.append(1)
 	
 	for i in range(N):
-		dW = np.random.randn(2,1)*(h/2)
+		dW = W[:,i]
+		# dW = np.random.randn(2,1)*(h/2)
 		currU = scheme(currU,dW,k,kSq,h,sigma)
 		for q in range(len(queries)):
 			if (i % queries[q].periodicity) == (queries[q].periodicity - 1):
