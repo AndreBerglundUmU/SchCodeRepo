@@ -1,13 +1,16 @@
 #! /usr/bin/env python
 from scipy.fftpack import fft, ifft
 import numpy as np
+import validation_functions as vf
 	
 def cubicU(currU,sigma):
+	vf.is_vector(currU)
 	return np.multiply(np.power(np.absolute(currU),2*sigma),currU)
 	
 def PSEulTypeSolver(currU,dW,k,kSq,h,sigma,G):
+	vf.is_vector(currU)
 	# Initialize loop variables
-	crit = true;
+	crit = True;
 	i = 1;
 	nextU = currU;
 	realSpaceCurrU = ifft(currU);
@@ -19,18 +22,18 @@ def PSEulTypeSolver(currU,dW,k,kSq,h,sigma,G):
 		currU)
 	b = 1j*h/(1 + 1j*dW/2*kSq);
 
-	while crit & i < 120:
+	while (crit and i < 120):
 		tempU = nextU;
 		nextU = a + np.multiply(b,fft(G(realSpaceCurrU,realSpaceNextU,sigma)));
 		realSpaceNextU=ifft(nextU);
 		crit = np.linalg.norm(tempU-nextU) > np.spacing(1);
 		i = i+1;
-	end
 	return nextU
 
 def PSNStarSolver(currU,firstHalfdW,k,kSq,h,sigma):
+	vf.is_vector(currU)
 	# Initialize loop variables
-	crit = true
+	crit = True
 	i = 1
 	NStar = currU
 	# Calculate some values which don't change
@@ -38,16 +41,17 @@ def PSNStarSolver(currU,firstHalfdW,k,kSq,h,sigma):
 		np.exp(-firstHalfdW*1j*kSq),
 		currU)
 
-	while crit & i < 120:
+	while crit and i < 120:
 		oldNStar = NStar
 		tempNStar = a + h/2*NStar
-		NStar = fft(cubicU(ifft(tempNStar)))
+		NStar = fft(1j*cubicU(ifft(tempNStar),sigma))
 		crit = np.linalg.norm(oldNStar-NStar) > np.spacing(1);
 		i = i+1;
-	end
-	return nextU
+	return NStar
 	
 def CNNonLin(u,v,sigma):
+	#vf.is_vector(u) #how expensive?
+	#vf.is_vector(v)
 	if sigma == 1:
 		retVal = np.multiply(
 			np.power(np.abs(u),2) + 
@@ -83,9 +87,12 @@ def CNNonLin(u,v,sigma):
 	return retVal
 
 def MEulNonLin(u,v,sigma):
-	retVal = cubicU(u)
+	#vf.is_vector(u) #how expensive?
+	retVal = cubicU(u,sigma)
 	return retVal
 
 def MPNonLin(u,v,sigma):
-	retVal = cubicU((u+v)/2)
+	#vf.is_vector(u) #how expensive?
+	#vf.is_vector(v)
+	retVal = cubicU((u+v)/2,sigma)
 	return retVal

@@ -36,7 +36,18 @@ u0 = lambda x: np.sqrt(2*alpha/q)*np.multiply(np.exp(0.5*1j*c*x),sech_fun(np.sqr
 u0FunVal = fft(u0(x))
 
 # Scheme
-scheme = ss.PSLieSpl
+scheme = ss.PSSymExp
+
+# PSFEul
+# PSBEul
+# PSCN
+# PSMEul
+# PSMP
+# PSStrangSpl
+# PSLieSpl
+# PSFourSpl
+# PSExplExp
+# PSSymExp
 
 # Query construction (query, size of return, number of time steps stored, total number of time steps)
 my_query = query_simulation.make_query(lambda x: x, M, storedTime, N)
@@ -47,4 +58,4 @@ result = query_simulation.pseudospectral_simulation(N,h,k,kSq,sigma,u0FunVal,dW,
 
 
 # Plot over time
-plot_functions.plotRunning(result,x,t,dW,storedTime,N,L)
+plot_functions.plot_physical_evolution(result,x,t,dW,storedTime,N,L)

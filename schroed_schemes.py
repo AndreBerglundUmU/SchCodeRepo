@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 from scipy.fftpack import fft, ifft
 import numpy as np
-import supportFunctions as sf
+import schroed_functions as sf
 
 def PSFEul(currU,dW,k,kSq,h,sigma):
 	a = (1 - 1j*np.sum(dW)*kSq);
@@ -16,15 +16,15 @@ def PSBEul(currU,dW,k,kSq,h,sigma):
 	return nextU
 
 def PSCN(currU,dW,k,kSq,h,sigma):
-	nextU = PSEulTypeSolver(currU,sum(dW),k,kSq,h,sigma,CNNonLin)
+	nextU = sf.PSEulTypeSolver(currU,sum(dW),k,kSq,h,sigma,sf.CNNonLin)
 	return nextU
 	
 def PSMEul(currU,dW,k,kSq,h,sigma):
-	nextU = PSEulTypeSolver(currU,sum(dW),k,kSq,h,sigma,MEulNonLin)
+	nextU = sf.PSEulTypeSolver(currU,sum(dW),k,kSq,h,sigma,sf.MEulNonLin)
 	return nextU
 	
 def PSMP(currU,dW,k,kSq,h,sigma):
-	nextU = PSEulTypeSolver(currU,sum(dW),k,kSq,h,sigma,MPNonLin)
+	nextU = sf.PSEulTypeSolver(currU,sum(dW),k,kSq,h,sigma,sf.MPNonLin)
 	return nextU
 	
 def PSStrangSpl(currU,dW,k,kSq,h,sigma):
@@ -52,11 +52,11 @@ def PSFourSpl(currU,dW,k,kSq,h,sigma):
 	return nextU
 	
 def PSExplExp(currU,dW,k,kSq,h,sigma):
-	nextU = np.multiply(np.exp(-sum(dW)*ij*kSq),currU) + 1j*h*np.multiply(np.exp(-sum(dW)*ij*kSq),fft(sf.cubicU(ifft(currU))))
+	nextU = np.multiply(np.exp(-sum(dW)*1j*kSq),currU) + 1j*h*np.multiply(np.exp(-sum(dW)*1j*kSq),fft(sf.cubicU(ifft(currU),sigma)))
 	return nextU
 	
 def PSSymExp(currU,dW,k,kSq,h,sigma):
 	kSquared = kSq;
-	NStar = PSNStarSolver(currU,dW[0],k,kSq,h,sigma)
-	currU = np.multiply(np.exp(-sum(dW)*1j*kSq),currU) + np.multiply(h*np.exp(-dW[1]*1j*kSq),NStar)
+	NStar = sf.PSNStarSolver(currU,dW[0],k,kSq,h,sigma)
+	nextU = np.multiply(np.exp(-sum(dW)*1j*kSq),currU) + np.multiply(h*np.exp(-dW[1]*1j*kSq),NStar)
 	return nextU

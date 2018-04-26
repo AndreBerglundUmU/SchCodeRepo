@@ -2,6 +2,7 @@
 from scipy.fftpack import fft, ifft
 import numpy as np
 import matplotlib.pyplot as plt
+import validation_functions as vf
 
 # import randomstate as rnd
 # Might be necessary for parallel rng generation
@@ -13,7 +14,9 @@ import matplotlib.pyplot as plt
 # import importlib
 # importlib.reload(...)
 
-def plotRunning(function_evolution,x,t,dW,storedTime,N,L):
+def plot_physical_evolution(function_evolution,x,t,dW,storedTime,N,L):
+	vf.is_vector(x)
+	# vf.is_matrix(function_evolution) # function_evolution is not a numpy matrix
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 	plotVal = ifft(function_evolution[0][0,:])

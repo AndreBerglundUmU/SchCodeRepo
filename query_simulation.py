@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import numpy as np
+import validation_functions as vf
 
 # import randomstate as rnd
 # Might be necessary for parallel rng generation
@@ -33,6 +34,9 @@ def make_query(function,spaceStorageSize,desiredTimeStorageSize,N):
     return query
 
 def pseudospectral_simulation(N,h,k,kSq,sigma,u0,W,scheme,queries):
+	vf.is_vector(u0)
+	vf.is_vector(k)
+	vf.is_vector(kSq)
 	# Need to preallocate memory for query results
 	currU = u0
 	queryStorage = []
