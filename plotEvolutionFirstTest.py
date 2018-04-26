@@ -1,9 +1,11 @@
 import numpy as np
-import schemes, supportFunctions as sf, workers
 import matplotlib.pyplot as plt
 from scipy.fftpack import fft, ifft
 from sympy import *
-import plotTools
+import schroed_schemes as ss
+import schroed_functions as sf
+import misc_functions as mf
+import plot_functions, query_simulation
 
 # Parameters
 sigma = 1
@@ -18,7 +20,7 @@ XInt = [-L,L]
 TInt = [0,T]
 h = (TInt[1]-TInt[0])/N
 dx = (XInt[1]-XInt[0])/M
-k = sf.createKVec(XInt[1],XInt[0],M)
+k = mf.createKVec(XInt[1],XInt[0],M)
 kSq = np.power(k,2)
 t = np.linspace(TInt[0],TInt[1],N+1)
 x = np.linspace(XInt[0],XInt[1],M,endpoint=False)
@@ -34,15 +36,15 @@ u0 = lambda x: np.sqrt(2*alpha/q)*np.multiply(np.exp(0.5*1j*c*x),sech_fun(np.sqr
 u0FunVal = fft(u0(x))
 
 # Scheme
-scheme = schemes.PSLieSpl
+scheme = ss.PSLieSpl
 
 # Query construction (query, size of return, number of time steps stored, total number of time steps)
-my_query = workers.make_query(lambda x: x, M, storedTime, N)
+my_query = query_simulation.make_query(lambda x: x, M, storedTime, N)
 
 # Generating Brownian motion and running the simulation
 dW = np.random.randn(2,N)*np.sqrt(h/2)
-query_result = workers.simulation(N,h,k,kSq,sigma,u0FunVal,dW,scheme,[my_query])
+result = query_simulation.pseudospectral_simulation(N,h,k,kSq,sigma,u0FunVal,dW,scheme,[my_query])
 
 
 # Plot over time
-plotTools.plotRunning(query_result,x,t,dW,storedTime,N,L)
+plot_functions.plotRunning(result,x,t,dW,storedTime,N,L)

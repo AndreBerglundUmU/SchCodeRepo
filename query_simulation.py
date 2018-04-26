@@ -1,8 +1,5 @@
 #! /usr/bin/env python
-from scipy.fftpack import fft, ifft
 import numpy as np
-import supportFunctions as sf
-import schemes
 
 # import randomstate as rnd
 # Might be necessary for parallel rng generation
@@ -30,14 +27,12 @@ class Query(object):
 	
 	def preallocateQueryResult(self):
 		return np.zeros(shape=(self.timeStorageSize,self.spaceStorageSize),dtype=np.complex_)
-		
 
-def make_query(function, spaceStorageSize, desiredTimeStorageSize,N):
+def make_query(function,spaceStorageSize,desiredTimeStorageSize,N):
     query = Query(function, spaceStorageSize, desiredTimeStorageSize,N)
     return query
 
-
-def simulation(N,h,k,kSq,sigma,u0,W,scheme,queries):
+def pseudospectral_simulation(N,h,k,kSq,sigma,u0,W,scheme,queries):
 	# Need to preallocate memory for query results
 	currU = u0
 	queryStorage = []

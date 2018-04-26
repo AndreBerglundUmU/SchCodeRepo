@@ -5,14 +5,6 @@ import numpy as np
 def cubicU(currU,sigma):
 	return np.multiply(np.power(np.absolute(currU),2*sigma),currU)
 	
-def createKVec(leftPoint,rightPoint,numModes):
-	halfNumber = int(numModes/2)
-	posModes = np.array(range(halfNumber))
-	negModes = np.flip(-np.array(range(1,halfNumber)),0)
-	tempVec = np.append(posModes,np.arange(1))
-	tempVec = np.append(tempVec,negModes)
-	return 2*np.pi/(rightPoint-leftPoint)*tempVec
-
 def PSEulTypeSolver(currU,dW,k,kSq,h,sigma,G):
 	# Initialize loop variables
 	crit = true;
@@ -97,5 +89,3 @@ def MEulNonLin(u,v,sigma):
 def MPNonLin(u,v,sigma):
 	retVal = cubicU((u+v)/2)
 	return retVal
-
-
