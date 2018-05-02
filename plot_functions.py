@@ -16,7 +16,7 @@ import validation_functions as vf
 # import importlib
 # importlib.reload(...)
 
-def plot_waterfall(function_evolution,x,stored_t):
+def plot_waterfall(function_evolution,x,stored_t,save_title):
 # https://stackoverflow.com/questions/31189665/plotting-using-polycollection-in-matplotlib
 	# fun_val = np.abs(function_evolution)
 	fig = plt.figure(figsize=(15,15))
@@ -41,10 +41,10 @@ def plot_waterfall(function_evolution,x,stored_t):
 	ax.set_zlabel('|u|')
 	#plt.show()
 	fig.canvas.draw()
-	plt.savefig('waterfall2.pdf')
+	plt.savefig(save_title)
 	return fig
 	
-def plot_norm_evolution(norm_evolution,stored_t,axis_args,norm_string):
+def plot_norm_evolution(norm_evolution,stored_t,axis_args,norm_string,save_title):
 	vf.is_vector(norm_evolution)
 	# vf.is_matrix(function_evolution) # function_evolution is not a numpy matrix
 	fig = plt.figure(figsize=(15,15))
@@ -53,7 +53,7 @@ def plot_norm_evolution(norm_evolution,stored_t,axis_args,norm_string):
 	plt.xlabel('t')
 	plt.ylabel(norm_string)
 	#plt.show()
-	plt.savefig('plot2.pdf')
+	plt.savefig(save_title)
 	return fig
 	
 def plot_physical_evolution(function_evolution,x,t,dW,storedTime,N,L):

@@ -33,9 +33,8 @@ def make_query(function,spaceStorageSize,desiredTimeStorageSize,N):
     query = Query(function, spaceStorageSize, desiredTimeStorageSize,N)
     return query
 
-def pseudospectral_simulation(N,h,k,kSq,sigma,u0,W,scheme,queries):
+def pseudospectral_simulation(N,h,kSq,sigma,u0,W,scheme,queries):
 	vf.is_vector(u0)
-	vf.is_vector(k)
 	vf.is_vector(kSq)
 	# Need to preallocate memory for query results
 	currU = u0
@@ -49,9 +48,33 @@ def pseudospectral_simulation(N,h,k,kSq,sigma,u0,W,scheme,queries):
 	for i in range(N):
 		dW = W[:,i]
 		# dW = np.random.randn(2,1)*(h/2)
-		currU = scheme(currU,dW,k,kSq,h,sigma)
+		currU = scheme(currU,dW,kSq,h,sigma)
 		for q in range(len(queries)):
 			if (i % queries[q].periodicity) == (queries[q].periodicity - 1):
+				queryStorage[q][queryIndex[q],:] = queries[q].function(currU)
+				queryIndex[q] += 1
+			
+	return queryStorage
+	
+def finite_difference_simulation(N,h,FDMatSq,sigma,u0,W,scheme,queries):
+	vf.is_vector(u0)
+	# Need to preallocate memory for query results
+	currU = u0
+	queryStorage = []
+	queryIndex = []
+	for q in range(len(queries)):
+		queryStorage.append(queries[q].preallocateQueryResult())
+		queryStorage[q][0,:] = queries[q].function(currU)
+		queryIndex.append(1)
+	
+	for i in range(N):
+		dW = W[:,i]
+		# dW = np.random.randn(2,1)*(h/2)
+		currU = scheme(currU,dW,FDMatSq,h,sigma)
+		for q in range(len(queries)):
+			if (i % queries[q].periodicity) == (queries[q].periodicity - 1):
+				print(currU)
+				print(type(currU))
 				queryStorage[q][queryIndex[q],:] = queries[q].function(currU)
 				queryIndex[q] += 1
 			

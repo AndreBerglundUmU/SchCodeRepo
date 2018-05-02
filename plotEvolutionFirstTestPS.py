@@ -23,7 +23,7 @@ XInt = [-L,L]
 TInt = [0,T]
 h = (TInt[1]-TInt[0])/N
 dx = (XInt[1]-XInt[0])/M
-k = mf.createKVec(XInt[1],XInt[0],M)
+k = mf.create_k_vec(XInt[1],XInt[0],M)
 kSq = np.power(k,2)
 t = np.linspace(TInt[0],TInt[1],N+1)
 stored_t = np.linspace(TInt[0],TInt[1],storedTime+1)
@@ -56,17 +56,17 @@ scheme = ss.PSLieSpl
 
 # Query construction (query, size of return, number of time steps stored, total number of time steps)
 my_query = query_simulation.make_query(lambda x: ifft(x), M, storedTime, N)
-my_query2 = query_simulation.make_query(lambda x: mf.L2Norm(ifft(x),dx), 1, storedTime, N)
+my_query2 = query_simulation.make_query(lambda x: mf.L2_norm(ifft(x),dx), 1, storedTime, N)
 norm_string = 'L2 norm'
 
 # Generating Brownian motion and running the simulation
 dW = np.random.randn(2,N)*np.sqrt(h/2)
-result = query_simulation.pseudospectral_simulation(N,h,k,kSq,sigma,u0FunVal,dW,scheme,[my_query,my_query2])
+result = query_simulation.pseudospectral_simulation(N,h,kSq,sigma,u0FunVal,dW,scheme,[my_query,my_query2])
 
 # Different plot tests
 l2_axis_args = [stored_t[0], stored_t[-1], 0, 1.1*np.max(result[1][:,0])]
-plot_functions.plot_waterfall(np.abs(result[0]),x,stored_t)
+plot_functions.plot_waterfall(np.abs(result[0]),x,stored_t,'waterfall_PS.pdf')
 time.sleep(3)
-plot_functions.plot_norm_evolution(result[1][:,0],stored_t,l2_axis_args,norm_string)
+plot_functions.plot_norm_evolution(result[1][:,0],stored_t,l2_axis_args,norm_string,'L2_evol_PS.pdf')
 time.sleep(1)
 #plot_functions.plot_physical_evolution(result[0],x,t,dW,storedTime,N,L)

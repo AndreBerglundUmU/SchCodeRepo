@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 from scipy.fftpack import fft, ifft
+from scipy import sparse, linalg
 import numpy as np
 import validation_functions as vf
 	
@@ -7,7 +8,7 @@ def cubicU(currU,sigma):
 	vf.is_vector(currU)
 	return np.multiply(np.power(np.absolute(currU),2*sigma),currU)
 	
-def PSEulTypeSolver(currU,dW,k,kSq,h,sigma,G):
+def PSEulTypeSolver(currU,dW,kSq,h,sigma,G):
 	vf.is_vector(currU)
 	# Initialize loop variables
 	crit = True;
@@ -26,11 +27,29 @@ def PSEulTypeSolver(currU,dW,k,kSq,h,sigma,G):
 		tempU = nextU;
 		nextU = a + np.multiply(b,fft(G(realSpaceCurrU,realSpaceNextU,sigma)));
 		realSpaceNextU=ifft(nextU);
-		crit = np.linalg.norm(tempU-nextU) > np.spacing(1);
+		crit = linalg.norm(tempU-nextU) > np.spacing(1);
 		i = i+1;
 	return nextU
 
-def PSNStarSolver(currU,firstHalfdW,k,kSq,h,sigma):
+def FDEulTypeSolver(currU,dW,FDMatSq,h,sigma,G):
+	vf.is_vector(currU)
+	# Initialize loop variables
+	crit = True;
+	i = 1;
+	nextU = currU;
+	# Calculate some values which don't change
+	A = sparse.eye(len(currU)) + 1j*dW/2*FDMatSq;
+	B = sparse.eye(len(currU)) - 1j*dW/2*FDMatSq;
+	AcurrU = np.matmul(A,currU)
+
+	while (crit and i < 120):
+		tempU = nextU;
+		nextU = linalg.solve(B,AcurrU + 1j*h*G(currU,nextU,sigma))
+		crit = linalg.norm(tempU-nextU) > np.spacing(1);
+		i = i+1;
+	return nextU
+	
+def PSNStarSolver(currU,firstHalfdW,kSq,h,sigma):
 	vf.is_vector(currU)
 	# Initialize loop variables
 	crit = True
@@ -40,12 +59,29 @@ def PSNStarSolver(currU,firstHalfdW,k,kSq,h,sigma):
 	a = np.multiply(
 		np.exp(-firstHalfdW*1j*kSq),
 		currU)
-
+		
 	while crit and i < 120:
 		oldNStar = NStar
 		tempNStar = a + h/2*NStar
 		NStar = fft(1j*cubicU(ifft(tempNStar),sigma))
-		crit = np.linalg.norm(oldNStar-NStar) > np.spacing(1);
+		crit = linalg.norm(oldNStar-NStar) > np.spacing(1);
+		i = i+1;
+	return NStar
+	
+def FDNStarSolver(currU,firstHalfdW,FDMatSq,h,sigma):
+	vf.is_vector(currU)
+	# Initialize loop variables
+	crit = True
+	i = 1
+	NStar = currU
+	# Calculate some values which don't change
+	a = np.matmul(linalg.expm(1j*firstHalfdW*FDMatSq),currU)
+	
+	while crit and i < 120:
+		oldNStar = NStar
+		tempNStar = a+h/2*NStar
+		NStar = cubicU(tempNStar,sigma)
+		crit = linalg.norm(oldNStar-NStar) > np.spacing(1);
 		i = i+1;
 	return NStar
 	
