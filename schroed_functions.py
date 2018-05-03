@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 from scipy.fftpack import fft, ifft
 from scipy import sparse, linalg
+import scipy.sparse.linalg as spla
 import numpy as np
 import validation_functions as vf
 	
@@ -38,18 +39,18 @@ def FDEulTypeSolver(currU,dW,FDMatSq,h,sigma,G):
 	i = 1;
 	nextU = currU;
 	# Calculate some values which don't change
-	A = sparse.eye(len(currU)) + 1j*dW/2*FDMatSq;
-	B = sparse.eye(len(currU)) - 1j*dW/2*FDMatSq;
-	AcurrU = np.matmul(A,currU)
+	A = sparse.eye(len(currU)) + 1j*dW/2*FDMatSq
+	B = sparse.eye(len(currU)) - 1j*dW/2*FDMatSq
+	AcurrU = A.dot(currU)
 
 	while (crit and i < 120):
 		tempU = nextU;
-		nextU = linalg.solve(B,AcurrU + 1j*h*G(currU,nextU,sigma))
+		nextU = spla.spsolve(B,AcurrU + 1j*h*G(currU,nextU,sigma))
 		crit = linalg.norm(tempU-nextU) > np.spacing(1);
 		i = i+1;
 	return nextU
 	
-def PSNStarSolver(currU,firstHalfdW,kSq,h,sigma):
+def PS_N_star_solver(currU,firstHalfdW,kSq,h,sigma):
 	vf.is_vector(currU)
 	# Initialize loop variables
 	crit = True
@@ -68,14 +69,14 @@ def PSNStarSolver(currU,firstHalfdW,kSq,h,sigma):
 		i = i+1;
 	return NStar
 	
-def FDNStarSolver(currU,firstHalfdW,FDMatSq,h,sigma):
+def FD_N_star_solver(currU,firstHalfdW,FDMatSq,h,sigma):
 	vf.is_vector(currU)
 	# Initialize loop variables
 	crit = True
 	i = 1
 	NStar = currU
 	# Calculate some values which don't change
-	a = np.matmul(linalg.expm(1j*firstHalfdW*FDMatSq),currU)
+	a = linalg.expm(1j*firstHalfdW*FDMatSq).dot(currU)
 	
 	while crit and i < 120:
 		oldNStar = NStar

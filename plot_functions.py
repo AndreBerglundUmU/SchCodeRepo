@@ -37,7 +37,7 @@ def plot_waterfall(function_evolution,x,stored_t,save_title):
 	ax.set_xlabel('x')
 	ax.set_ylim3d(stored_t.min(), stored_t.max())
 	ax.set_ylabel('t')
-	ax.set_zlim3d(function_evolution.min(), function_evolution.max())
+	ax.set_zlim3d(function_evolution.min(), min(function_evolution.max(),10))
 	ax.set_zlabel('|u|')
 	#plt.show()
 	fig.canvas.draw()

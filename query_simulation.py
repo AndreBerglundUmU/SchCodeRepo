@@ -73,8 +73,9 @@ def finite_difference_simulation(N,h,FDMatSq,sigma,u0,W,scheme,queries):
 		currU = scheme(currU,dW,FDMatSq,h,sigma)
 		for q in range(len(queries)):
 			if (i % queries[q].periodicity) == (queries[q].periodicity - 1):
-				print(currU)
-				print(type(currU))
+				#print(currU)
+				#print(type(currU))
+				#print(q)
 				queryStorage[q][queryIndex[q],:] = queries[q].function(currU)
 				queryIndex[q] += 1
 			
