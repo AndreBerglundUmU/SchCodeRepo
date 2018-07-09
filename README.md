@@ -2,6 +2,7 @@
 
 This repository is an attempt to implement of several numerical schemes for the stochastic nonlinear Schrödingers equation using Python.
 Should you require help, it is for the moment possible to contact me via andre.berglund@umu.se .
+The MATLAB implementation of this code is more complete and readable.
 
 All code within this repository is distributed with the following licence in mind:
 
